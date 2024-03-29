@@ -1,0 +1,9 @@
+rm test out
+cd bld
+gmake clean
+gmake 
+##cd ../samples
+##rm -rf *.txt
+cd ..
+./test > out
+more out

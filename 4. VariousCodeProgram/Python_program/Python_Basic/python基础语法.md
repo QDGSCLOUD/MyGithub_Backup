@@ -1,4 +1,4 @@
-# Python 的安装
+#  pPython 的安装
 
 ## Windows下
 
@@ -8,7 +8,7 @@
 
 ## Linux 下
 
-![image-20240314154850384](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img3/image-20240314154850384.png)
+an![image-20240314154850384](https://raw.githubusercontent.com/QDGSCLOUD/BJYH_picture/main/img3/image-20240314154850384.png)
 
 
 
@@ -513,7 +513,6 @@ DataArray 常用属性
     values:  实际数据
     attrs:   保存数据的字典( 分辨率, 单位  缺测值 等)
     
-    
 Dataset:由多个维度相关联的DataArray组成的字典, 常用属性: 
     dims: 数据对象每个维度的名字和长度
     coords: 每个维度的坐标
@@ -783,12 +782,12 @@ plt.style.use('deault')
 >
 > 	 1. **像素图**
 >   	 2. **网络图**
->   	 3. **等值线图**
->   	 4. **填充图 `contourf`**  (下方未记录, 其用法与 `confour` 基本一致. 
->   	 5. **风羽图**
->   	 6. **矢量图**
->   	 7. **流场图**
->   	 8. 
+>         	 3. **等值线图**
+>             	 4. **填充图 `contourf`**  (下方未记录, 其用法与 `confour` 基本一致. 
+>         	 5. **风羽图**
+>           	 6. **矢量图**
+>                 	 7. **流场图**
+>                     	 8. 
 
 ```python
 fig, ax = plt.subplots()
@@ -1025,7 +1024,7 @@ print(allData)
 #  底图上标量数据的绘制
 fig  = plt.figure(figsize=(10,5))
 ax = fig.add_subplot(projection = ccrs.Robinson(central_longitude = 180))
-# ax.stock_img()
+# ax.stock_img()         # 该句设置以后,   add_feature 就没啥用了
 ax.coastlines()
 # ax.set_global()
 ax.add_feature(cfeature.LAND, color = 'lightgrey')
@@ -1383,6 +1382,12 @@ signal.savgol_filter(x,61,1)        #  这个savgol 滤波器进行平滑处理�
 
 
 
+
+
+
+# 机器学习
+
+加油啃西瓜书
 
 
 
